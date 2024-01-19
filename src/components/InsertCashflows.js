@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const InsertTrades = () => {
+const InsertCashflows = () => {
   const [file, setFile] = useState(null);
   const [tradeColumns, setTradeColumns] = useState([]);
   const [userInputValues, setUserInputValues] = useState({
-    identifier: "",
-    issue_date: "",
-    maturity_date: "",
-    invested_amount: "",
-    debtor_identifier: "",
-    seller_identifier: "",
-    interest_rate: ""
+    operation: "",
+    timestamp: "",
+
+    amount: "",
+    trade_identifier: "",
+    platform_transaction_id: "",
+
   });
 
   const handleFileChange = async (event) => {
@@ -20,9 +20,9 @@ const InsertTrades = () => {
       setFile(selectedFile);
 
       const formDataTrade = new FormData();
-      formDataTrade.append('trades', selectedFile);
+      formDataTrade.append('cashflows', selectedFile);
 
-      const response = await axios.post("http://127.0.0.1:8000/investment_management/trades_columns/", formDataTrade);
+      const response = await axios.post("http://127.0.0.1:8000/investment_management/cashflow_columns/", formDataTrade);
       console.log("Response:", response);
       setTradeColumns(response.data);
     } catch (error) {
@@ -40,13 +40,13 @@ const InsertTrades = () => {
   const handleTradeInsert = async () => {
     try {
       const formData = new FormData();
-      formData.append('trades', file);
+      formData.append('cashflows', file);
       const tradeMappingJSON = JSON.stringify(userInputValues);
-      formData.append('trade_mapping',tradeMappingJSON)
+      formData.append('cashflow_mapping',tradeMappingJSON)
         console.log(formData);
       console.log("Request Payload:", formData);  // Log the request payload
 
-      const response = await axios.post("http://127.0.0.1:8000/investment_management/mapping-fields/", formData);
+      const response = await axios.post("http://127.0.0.1:8000/investment_management/cashflow_mapping/", formData);
         console.log(formData);
 
     } catch (error) {
@@ -58,7 +58,7 @@ const InsertTrades = () => {
 
   return (
     <div className='h-screen bg-[#130b35] text-white p-8'>
-      <h1 className="text-3xl font-bold text-white">Trade Mapping</h1>
+      <h1 className="text-3xl font-bold text-white">Cashflow Mapping</h1>
       <div>
         <label htmlFor="fileInput">Select File:</label>
         <input className="bg-gray-50 border w-1/5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" type="file" id="fileInput" onChange={handleFileChange} />
@@ -100,4 +100,4 @@ const InsertTrades = () => {
   );
 }
 
-export default InsertTrades;
+export default InsertCashflows;
