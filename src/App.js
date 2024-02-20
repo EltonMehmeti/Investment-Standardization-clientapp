@@ -1,32 +1,29 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import InsertCashflows from "./components/InsertCashflows";
-import InsertTrades from "./components/InsertTrades";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { DndProvider } from "react-dnd";
-import DragDrop from "./components/DragDrop";
-import TradeList from "./components/TradeList";
-import SingleTrade from "./components/SingleTrade";
+import Home from "./pages/Home";
+import Synchronizer from "./components/synchronize";
+import Trade from "./components/Trade";
+import CashFlow from "./components/CashFlow";
+import TradeDetail from "./components/SingleTrade";
+import Task from "./components/Task";
 
 function App() {
   return (
     <>
-      <DndProvider backend={HTML5Backend}>
     <Router>
-      <div className="App">
+      <div className="h-auto">
         <Routes>
-          <Route path="/insert-cashflows" element={<InsertCashflows />} />
-          <Route path="/insert-trades" element={<InsertTrades />} />
-          <Route path="/trades-list" element={<TradeList />} />
-          <Route path={`/trade/:identifier`} element={<SingleTrade />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/synchronize" element={<Synchronizer />} />
+          <Route path="/trades" element={<Trade />} />
+          <Route path="/trade/:id" element={<TradeDetail />} />
+          <Route path="/cashflow" element={<CashFlow />} />
+          <Route path="/task/:id" element={<Task />} />
+     
 
         </Routes>
       </div>
     </Router>
-      {/* <div className="App">
-        <DragDrop />
-      </div> */}
-    </DndProvider>
     </>
   );
 }
