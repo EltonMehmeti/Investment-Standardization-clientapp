@@ -73,13 +73,15 @@ const TradeDetail = () => {
                     <p>Realized Amount: {realizedAmount}</p>
                     <p>Gross Expected Amount: {grossExpectedAmount}</p>
                     <p>Remaining Invested Amount: {remainingInvestedAmount}</p>
-                    <p>Closing Date: <p className={`${closingDate == 'Loan Not Closed!' ? 'text-red-600' : 'text-green-500'}`}>
+                    <p>Closing Date: <p className={`${closingDate === 'Loan Not Closed!' ? 'text-red-600' : 'text-green-500'}`}>
                         
                         {closingDate}
                         </p>
                         </p>
                 </div>
-                <table className="w-1/3 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 ">
+                <div className='max-h-[40vh] overflow-y-scroll'>
+
+                <table className="w-1/3 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400  ">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 ">
             <tr>
               <th scope="col" className="px-6 py-3">Identifier</th>
@@ -91,7 +93,7 @@ const TradeDetail = () => {
           </thead>
           <tbody className='max-h-[70vh] overflow-y-scroll'>
             {trade.cash_flows?.map((cashflow, index) => (
-              <tr key={index} className={`${index % 2 === 0 ? 'even:bg-gray-50 even:dark:bg-gray-800' : 'odd:bg-white odd:dark:bg-gray-900'} border-b dark:border-gray-700`}>
+                <tr key={index} className={`${index % 2 === 0 ? 'even:bg-gray-50 even:dark:bg-gray-800' : 'odd:bg-white odd:dark:bg-gray-900'} border-b dark:border-gray-700`}>
                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{cashflow.identifier}</td>
                 <td className="px-6 py-4">{cashflow.amount}</td>
                 <td className="px-6 py-4">{cashflow.date}</td>
@@ -102,6 +104,7 @@ const TradeDetail = () => {
             ))}
           </tbody>
         </table>
+                </div>
                 </>
                 
             ) : (

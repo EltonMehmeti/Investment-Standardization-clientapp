@@ -35,20 +35,11 @@ const Synchronizer = () => {
     { column_name: '', operator: '', value: '', condition: [{ column_name: '', operator: '==', value: '' }] }
   ]);
   const [tradeMergeColumns, setTradeMergeColumns] = useState([
-      {
-         "new_column_name": "",
-         "operator": "sum",
-         "columns_to_merge": ["", ""]
-      }
+
   ])
   const [cashflowMergeColumns, setCashflowMergeColumns] = useState([
-      {
-         "new_column_name": "",
-         "operator": "sum",
-         "columns_to_merge": ["", ""]
-      }
+  
   ])
-
   const [openModalIndex, setOpenModalIndex] = useState(null);
 
   const handleOpenModal = (index) => {
@@ -105,6 +96,7 @@ const Synchronizer = () => {
       } else {
         newTradeMergeColumns[index][key] = value;
       }
+      console.log(newTradeMergeColumns);
       setTradeMergeColumns(newTradeMergeColumns);
     } else if (type === 'cashflow') {
       const newCashflowMergeColumns = [...cashflowMergeColumns];
@@ -113,6 +105,7 @@ const Synchronizer = () => {
       } else {
         newCashflowMergeColumns[index][key] = value;
       }
+      console.log(newCashflowMergeColumns);
       setCashflowMergeColumns(newCashflowMergeColumns);
     }
   };
@@ -136,7 +129,7 @@ const Synchronizer = () => {
         ...tradeMergeColumns,
         {
           "new_column_name": "",
-          "operator": "sum",
+          "operator": "",
           "columns_to_merge": ["", ""]
        }
       ]);
@@ -145,7 +138,7 @@ const Synchronizer = () => {
         ...cashflowMergeColumns,
         {
           "new_column_name": "",
-          "operator": "sum",
+          "operator": "",
           "columns_to_merge": ["", ""]
        }
       ]);
@@ -256,7 +249,6 @@ const invertedCashFlowColumns = invertObject(selectedCashFlowColumns);
 
 const handleSubmit = (e) => {
   e.preventDefault();
-
   const organizationId = sessionStorage.getItem('organizationId');
   const formData = new FormData();
   if (tradeFile) {
@@ -276,25 +268,46 @@ const handleSubmit = (e) => {
     cash_flow: cashflowValuesToReplace.column_name !== '' ? cashflowValuesToReplace : null
   }));
   formData.append('merge_columns', JSON.stringify({
-    trade: tradeMergeColumns,
-    cash_flow: cashflowMergeColumns
+    trade: tradeMergeColumns.new_column_name !== ''? tradeMergeColumns : null,
+    cash_flow: cashflowMergeColumns.new_column_name !== '' ? cashflowMergeColumns: null 
   }));
-  formData.append('organization_id', organizationId);
 
+  formData.append('organization_id', organizationId);
   axios.post("http://localhost:8000/synchronize", formData)
     .then(response => {
-      toast.info(response.data.message)
-      response.data.task_ids?.map(task=>{
-      toast.info(
-<Link to={`/task/${task}`}>{task}</Link>
-
-      )
-        
-      })
+      toast.info(response.data.message);
+      if (response.data.task_ids) {
+        response.data.task_ids.forEach(task => {
+          toast.info(
+            <Link to={`/task/${task}`}>{task}</Link>
+          );
+        });
+      }
     })
     .catch(error => {
-      toast.error(error)
       console.log(error);
+      if (error.response) {
+        const responseData = error.response.data;
+        if (responseData && typeof responseData === 'object') {
+          Object.values(responseData).forEach(value => {
+            if (Array.isArray(value)) {
+              value.forEach(errorMsg => {
+                toast.error(errorMsg);
+              });
+            } else {
+              toast.error(value);
+            }
+          });
+        } else {
+          toast.error(responseData.message || 'An error occurred');
+        }
+      } else if (error.request) {
+        toast.error('No response received from the server');
+        console.error('No response received from the server');
+      } else {
+        toast.error('An error occurred while sending the request');
+        console.error('An error occurred while sending the request', error.message);
+      }
     });
 };
 
@@ -713,8 +726,8 @@ const handleSaveConfiguration = () => {
                 onChange={(e) => handleMergeColumnsChange(index, e.target.value, 'operator', 'trade')}
               >
                 <option value="sum">Sum</option>
-                <option value="sum">Subtract</option>
-                <option value="sum">Multiply</option>
+                <option value="subtract">Subtract</option>
+                <option value="multiply">Multiply</option>
               </select>
        
                 <select
@@ -773,8 +786,8 @@ const handleSaveConfiguration = () => {
             onChange={(e) => handleMergeColumnsChange(index, e.target.value, 'operator', 'cashflow')}
           >
             <option value="sum">Sum</option>
-            <option value="sum">Subtract</option>
-            <option value="sum">Multiply</option>
+            <option value="subtract">Subtract</option>
+            <option value="multiply">Multiply</option>
           </select>
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm  focus:ring-blue-500 focus:border-blue-500 block  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
